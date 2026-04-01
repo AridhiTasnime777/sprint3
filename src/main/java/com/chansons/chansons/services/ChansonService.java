@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 
 import com.chansons.chansons.entities.Album;
 import com.chansons.chansons.entities.Chanson;
-
+import com.chansons.chansons.dto.ChansonDTO;  // ✅ FIX: was missing — caused "cannot find symbol ChansonDTO"
 public interface ChansonService {
 	Page<Chanson> getAllChansonsParPage(int page, int size);
     Chanson saveChanson(Chanson c);
@@ -24,4 +24,5 @@ public interface ChansonService {
 	List<Chanson> findByOrderByTitleAsc();
 	List<Chanson> trierChansonsParTitreEtDate();
 	List<Album> getAllAlbums();
+	ChansonDTO convertEntityToDto (Chanson chanson);
 }

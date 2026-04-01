@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="utf-8">
 <title>Liste des Chansons</title>
@@ -31,9 +32,9 @@
             <td th:if="${p.album != null}" th:text="${p.album.nomAlb}"></td>
             <td th:if="${p.album == null}">Pas d'Album</td>
             <td>
-              <a class="btn btn-success btn-sm"
+              <a class="btn btn-success btn-sm" sec:authorize="hasAuthority('ADMIN')"
                  th:href="@{/modifierChanson(id=${p.idChanson},page=${currentPage},size=${size})}">Éditer</a>
-              <a class="btn btn-danger btn-sm"
+              <a class="btn btn-danger btn-sm" sec:authorize="hasAuthority('ADMIN')"
                  onclick="return confirm('Êtes-vous sûr ?')"
                  th:href="@{/supprimerChanson(id=${p.idChanson},page=${currentPage},size=${size})}">Supprimer</a>
             </td>
