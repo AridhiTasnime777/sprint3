@@ -1,0 +1,27 @@
+<div class="container mt-4">
+    <div>
+        <h2>Modifier une Chanson :</h2>
+    </div>
+    <form>
+        <div class="col-sm-2 col-md-2 col-lg-2">
+            <label>ID Chanson</label>
+            <input readonly type="text" [(ngModel)]="currentChanson.idChanson" name="idChanson" class="form-control">
+        </div>
+        <div class="col-sm-4 col-md-4 col-lg-4">
+            <label>Titre de la Chanson</label>
+            <input type="text" [(ngModel)]="currentChanson.title" name="title" class="form-control">
+        </div>
+        <div class="col-sm-4 col-md-4 col-lg-4">
+            <label>Artiste</label>
+            <input type="text" [(ngModel)]="currentChanson.artist" name="artist" class="form-control">
+        </div>
+        <div class="col-sm-4 col-md-4 col-lg-4">
+            <label>Date de Sortie</label>
+            <!-- Note: binding Date correctly in input type='date' requires special handling, but we use standard string for simplicity in tutorial -->
+            <input type="date" [ngModel]="currentChanson.releaseDate | date: 'yyyy-MM-dd'" (ngModelChange)="currentChanson.releaseDate = $event" name="releaseDate" class="form-control">
+        </div>
+        <div class="mt-2">
+            <button type="submit" (click)="updateChanson()" class="btn btn-success">Modifer</button>
+        </div>
+    </form>
+</div>
