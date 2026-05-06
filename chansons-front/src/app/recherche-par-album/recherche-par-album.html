@@ -1,0 +1,32 @@
+<div class="container mt-4">
+    <div class="col-sm-4 col-md-4 col-lg-4 mb-4">
+        <label>Album</label>
+        <select class="form-control" id="idalb" name="idalb" [(ngModel)]="IdAlbum" (change)="onChange()">
+            @for(alb of albums; track alb.idalb) {
+                <option value="{{alb.idalb}}">{{alb.nomAlb}}</option>
+            }
+        </select>
+    </div>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <table class="table table-striped">
+                <tr><th>Id</th><th>Titre</th><th>Artiste</th><th>Date Sortie</th><th>Album</th></tr>
+                @for(chanson of produits; track chanson.idChanson) {
+                    <tbody>
+                        <tr>
+                            <td>{{chanson.idChanson}}</td>
+                            <td>{{chanson.title}}</td>
+                            <td>{{chanson.artist}}</td>
+                            <td>{{chanson.releaseDate | date:'dd/MM/yyyy'}}</td>
+                            @if(chanson.album) {
+                                <td>{{chanson.album.nomAlb}}</td>
+                            } @else {
+                                <td>PAS D'ALBUM</td>
+                            }
+                        </tr>
+                    </tbody>
+                }
+            </table>
+        </div>
+    </div>
+</div>

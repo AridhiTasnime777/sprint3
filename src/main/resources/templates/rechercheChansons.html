@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+  <meta charset="utf-8">
+  <title>Recherche de Chansons</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div th:replace="~{template :: navbar}"></div>
+
+<div class="container mt-5">
+  <h4 class="mb-4">🔍 Recherche de Chansons</h4>
+
+  <div class="row">
+    <!-- Recherche par Artiste -->
+    <div class="col-md-5">
+      <div class="card shadow-sm mb-4"
+           th:classappend="${mode == null || mode == 'artiste'} ? 'border-primary' : ''">
+        <div class="card-header"
+             th:classappend="${mode == null || mode == 'artiste'} ? 'bg-primary text-white' : ''">
+          Par Artiste
+        </div>
+        <div class="card-body">
+          <form th:action="@{/rechercherParArtiste}" method="get">
+            <div class="form-group">
+              <label>Nom de l'artiste :</label>
+              <input type="text" name="artist" class="form-control"
+                     placeholder="Ex: Adele" th:value="${artist}">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Rechercher</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recherche par Artiste et Titre -->
+    <div class="col-md-7">
+      <div class="card shadow-sm mb-4"
+           th:classappend="${mode == 'artiste-titre'} ? 'border-success' : ''">
+        <div class="card-header"
+             th:classappend="${mode == 'artiste-titre'} ? 'bg-success text-white' : ''">
+          Par Artiste et Titre
+        </div>
+        <div class="card-body">
+          <form th:action="@{/rechercherParArtisteEtTitre}" method="get">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label>Artiste :</label>
+                <input type="text" name="artist" class="form-control"
+                       placeholder="Ex: Adele" th:value="${artist}">
+              </div>
+              <div class="form-group col-md-6">
+                <label>Titre :</label>
+                <input type="text" name="title" class="form-control"
+                       placeholder="Ex: Hello" th:value="${title}">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-success btn-block">Rechercher</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Table -->
+  <div class="card shadow-sm" th:if="${chansons != null}">
+    <div class="card-header bg-dark text-white">
+      Résultats
+      <span class="badge badge-light ml-2" th:text="${#lists.size(chansons)}">0</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="alert alert-info m-3" th:if="${#lists.isEmpty(chansons)}">
+        Aucun résultat trouvé pour votre recherche.
+      </div>
+      <table class="table table-hover mb-0" th:if="${!#lists.isEmpty(chansons)}">
+        <thead class="thead-light">
+          <tr>
+            <th>#</th>
+            <th>Titre</th>
+            <th>Artiste</th>
+            <th>Album</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="p, stat : ${chansons}">
+            <td th:text="${stat.count}"></td>
+            <td th:text="${p.title}"></td>
+            <td th:text="${p.artist}"></td>
+            <td>
+              <span th:if="${p.album != null}" th:text="${p.album.nomAlb}"></span>
+              <span th:if="${p.album == null}" class="text-muted">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{template :: scripts}"></div>
+</body>
+</html>

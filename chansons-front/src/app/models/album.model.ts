@@ -1,5 +1,5 @@
 export class Album {
     idalb!: number;
-    nomalb!: string;
-    descriptionalb!: string;
+    nomAlb!: string;
+    descriptionAlb!: string;
 }

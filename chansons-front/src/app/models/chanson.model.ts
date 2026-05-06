@@ -4,5 +4,5 @@ export class Chanson {
     title!: string;
     artist!: string;
     releaseDate!: Date;
-    album!: Album;
+    album?: Album;
 }

@@ -10,6 +10,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public interface ChansonRepository extends JpaRepository<Chanson, Long> {
 
     // Find by exact title
@@ -20,6 +23,9 @@ public interface ChansonRepository extends JpaRepository<Chanson, Long> {
 
     // Find by artist containing a keyword
     List<Chanson> findByArtistContains(String artist);
+
+    // Find by both artist and title containing keywords
+    List<Chanson> findByArtistContainsAndTitleContains(String artist, String title);
 
     // Custom query: chansons whose title ends with 'nom' and released after a date
     @Query("select c from Chanson c where c.title like %:nom and c.releaseDate > :date")

@@ -1,0 +1,32 @@
+<div class="container mt-4">
+    <form class="form-inline mb-3">
+        <div class="form-group mx-sm-3 mb-2 mt-2">
+            <label class="mr-2">Recherche par nom :</label>
+            <input type="text" class="form-control mr-2" [(ngModel)]="searchTerm" name="searchTerm"
+                   #searchInput (keyup)="onKeyUp(searchInput.value)" placeholder="Titre...">
+            <button type="button" (click)="rechercherChansons()" class="btn btn-primary ml-2">Rechercher</button>
+        </div>
+    </form>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <table class="table table-striped">
+                <tr><th>Id</th><th>Titre</th><th>Artiste</th><th>Date Sortie</th><th>Album</th></tr>
+                @for(chanson of chansons; track chanson.idChanson) {
+                    <tbody>
+                        <tr>
+                            <td>{{chanson.idChanson}}</td>
+                            <td>{{chanson.title}}</td>
+                            <td>{{chanson.artist}}</td>
+                            <td>{{chanson.releaseDate | date:'dd/MM/yyyy'}}</td>
+                            @if(chanson.album) {
+                                <td>{{chanson.album.nomAlb}}</td>
+                            } @else {
+                                <td>PAS D'ALBUM</td>
+                            }
+                        </tr>
+                    </tbody>
+                }
+            </table>
+        </div>
+    </div>
+</div>

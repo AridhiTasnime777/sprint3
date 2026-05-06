@@ -114,4 +114,34 @@ public class ChansonController {
         modelMap.addAttribute("size", size);
         return "formChanson";
     }
+    @RequestMapping("/rechercheChansons")
+    public String rechercheChansons(
+            @RequestParam(name = "mode", defaultValue = "artiste") String mode,
+            ModelMap modelMap) {
+        modelMap.addAttribute("chansons", null);
+        modelMap.addAttribute("mode", mode);
+        return "rechercheChansons";
+    }
+
+    @RequestMapping("/rechercherParArtiste")
+    public String rechercherParArtiste(@RequestParam("artist") String artist, ModelMap modelMap) {
+        List<Chanson> chansons = chansonService.findByArtistContains(artist);
+        modelMap.addAttribute("chansons", chansons);
+        modelMap.addAttribute("artist", artist);
+        modelMap.addAttribute("mode", "artiste");
+        return "rechercheChansons";
+    }
+
+    @RequestMapping("/rechercherParArtisteEtTitre")
+    public String rechercherParArtisteEtTitre(
+            @RequestParam("artist") String artist,
+            @RequestParam("title") String title,
+            ModelMap modelMap) {
+        List<Chanson> chansons = chansonService.findByArtistContainsAndTitleContains(artist, title);
+        modelMap.addAttribute("chansons", chansons);
+        modelMap.addAttribute("artist", artist);
+        modelMap.addAttribute("title", title);
+        modelMap.addAttribute("mode", "artiste-titre");
+        return "rechercheChansons";
+    }
 }

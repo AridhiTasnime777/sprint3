@@ -1,46 +1,50 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Chanson } from '../models/chanson.model';
+import { Album } from '../models/album.model';
+
+const httpOptions = {
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChansonService {
-  chansons: Chanson[]; 
+  apiURL: string = 'http://localhost:8081/chansons/chansons/api';
 
-  constructor() {
-    this.chansons = [
-      { idChanson: 1, title: "Bohemian Rhapsody", artist: "Queen", releaseDate: new Date("1975-10-31"), album: { idalb: 1, nomalb: "A Night at the Opera", descriptionalb: "Classic Album" } },
-      { idChanson: 2, title: "Imagine", artist: "John Lennon", releaseDate: new Date("1971-09-09"), album: { idalb: 2, nomalb: "Imagine", descriptionalb: "Legendary Album" } },
-      { idChanson: 3, title: "Hotel California", artist: "Eagles", releaseDate: new Date("1976-12-08"), album: { idalb: 3, nomalb: "Hotel California", descriptionalb: "Rock Masterpiece" } }
-    ];
+  constructor(private http: HttpClient) {}
+
+  listeChansons(): Observable<Chanson[]> {
+    return this.http.get<Chanson[]>(this.apiURL + '/chansons');
   }
 
-  listeChansons(): Chanson[] {
-    return this.chansons;
+  ajouterChanson(ch: Chanson): Observable<Chanson> {
+    return this.http.post<Chanson>(this.apiURL + '/chansons', ch, httpOptions);
   }
 
-  ajouterChanson( ch: Chanson){
-    this.chansons.push(ch);
+  supprimerChanson(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiURL}/chansons/${id}`, httpOptions);
   }
 
-  supprimerChanson( ch: Chanson){
-    const index = this.chansons.indexOf(ch, 0);
-    if (index > -1) {
-      this.chansons.splice(index, 1);
-    }
+  consulterChanson(id: number): Observable<Chanson> {
+    return this.http.get<Chanson>(`${this.apiURL}/chansons/${id}`);
   }
 
-  consulterChanson(id:number): Chanson | undefined {
-    return this.chansons.find(c => c.idChanson == id);
+  updateChanson(ch: Chanson): Observable<Chanson> {
+    return this.http.put<Chanson>(this.apiURL + '/chansons', ch, httpOptions);
   }
 
-  updateChanson(ch: Chanson) {
-    this.supprimerChanson(ch);
-    this.ajouterChanson(ch);
-    this.sortChansons();
+  listeAlbums(): Observable<Album[]> {
+    return this.http.get<Album[]>(this.apiURL + '/alb');
   }
 
-  sortChansons() {
-    this.chansons.sort((x,y) => (x.idChanson > y.idChanson ? 1 : -1));
+  rechercherParNom(nom: string): Observable<Chanson[]> {
+    return this.http.get<Chanson[]>(`${this.apiURL}/chansons/byName/${nom}`);
+  }
+
+  rechercherParAlbum(idalb: number): Observable<Chanson[]> {
+    return this.http.get<Chanson[]>(`${this.apiURL}/chansons/byAlbum/${idalb}`);
   }
 }

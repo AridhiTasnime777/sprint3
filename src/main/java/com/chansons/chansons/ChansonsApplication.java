@@ -24,7 +24,6 @@ public class ChansonsApplication implements CommandLineRunner {
     public static void main(String[] args) {
         SpringApplication.run(ChansonsApplication.class, args);
     }
-/* 
     @PostConstruct
     void init_users() {
         // Clean up first to avoid duplicates on restart
@@ -47,7 +46,7 @@ public class ChansonsApplication implements CommandLineRunner {
         userService.addRoleToUser("tasnime", "AGENT");
         userService.addRoleToUser("user1", "USER");
     }
-*/
+
     @Override
     public void run(String... args) throws Exception {
         System.out.println("Password Encoded BCRYPT:");

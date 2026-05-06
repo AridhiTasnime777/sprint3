@@ -70,6 +70,16 @@ public class ChansonServicelmpm implements ChansonService {
     }
 
     @Override
+    public List<Chanson> findByArtistContains(String artist) {
+        return chansonRepository.findByArtistContains(artist);
+    }
+
+    @Override
+    public List<Chanson> findByArtistContainsAndTitleContains(String artist, String title) {
+        return chansonRepository.findByArtistContainsAndTitleContains(artist, title);
+    }
+
+    @Override
     public List<Chanson> findByTitleAndDateAfter(String title, Date date) {
         return chansonRepository.findByTitleAndDateAfter(title, date);
     }
@@ -99,7 +109,6 @@ public class ChansonServicelmpm implements ChansonService {
         return albumRepository.findAll();
     }
 
-    // 🔥 DTO
     @Override
     public ChansonDTO convertEntityToDto(Chanson ch) {
         ChansonDTO dto = new ChansonDTO();
