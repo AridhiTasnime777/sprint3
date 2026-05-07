@@ -9,7 +9,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 })
 export class AuthService {
 
-  apiURL: string = 'http://localhost:8081/chansons/chansons';
+  apiURL: string = 'http://localhost:8081';
   token!: string | null;
   private helper = new JwtHelperService();
   public loggedUser!: string;
@@ -20,7 +20,7 @@ export class AuthService {
               private http: HttpClient) { }
 
   login(user: User) {
-    return this.http.post<User>(this.apiURL + '/api/login', user, { observe: 'response' });
+    return this.http.post<User>(this.apiURL + '/login', user, { observe: 'response' });
   }
 
   saveToken(jwt: string) {

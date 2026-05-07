@@ -12,7 +12,7 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class ChansonService {
-  apiURL: string = 'http://localhost:8081/chansons/chansons/api';
+  apiURL: string = 'http://localhost:8081/api';
 
   constructor(private http: HttpClient) {}
 
@@ -46,5 +46,11 @@ export class ChansonService {
 
   rechercherParAlbum(idalb: number): Observable<Chanson[]> {
     return this.http.get<Chanson[]>(`${this.apiURL}/chansons/byAlbum/${idalb}`);
+  }
+
+  uploadImage(file: File): Observable<any> {
+    const imageFormData = new FormData();
+    imageFormData.append('image', file, file.name);
+    return this.http.post<any>('http://localhost:8081/api/image/upload', imageFormData);
   }
 }

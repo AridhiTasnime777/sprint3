@@ -48,47 +48,22 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(1)
-    public SecurityFilterChain apiFilterChain(HttpSecurity http, AuthenticationManager authMgr) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authMgr) throws Exception {
         http
-            .securityMatcher("/api/**")
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/login").permitAll()
+                .requestMatchers("/login", "/api/login", "/webjars/**", "/resources/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/chansons/**").hasAnyAuthority("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/api/chansons/**").hasAnyAuthority("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/chansons/**").hasAnyAuthority("ADMIN", "USER")
                 .requestMatchers(HttpMethod.PUT, "/api/chansons/**").hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/chansons/**").hasAuthority("ADMIN")
+                .requestMatchers("/api/image/**").hasAnyAuthority("ADMIN", "USER")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new JWTAuthenticationFilter(authMgr), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/webjars/**", "/resources/**").permitAll()
-                .requestMatchers("/showCreate", "/saveChanson", "/supprimerChanson", "/modifierChanson").hasAnyAuthority("ADMIN", "AGENT")
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/ListeChansons")
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
-                .permitAll()
-            )
-            .exceptionHandling(ex -> ex.accessDeniedPage("/accessDenied"));
 
         return http.build();
     }

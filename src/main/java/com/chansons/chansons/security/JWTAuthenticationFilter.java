@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,20 +29,35 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         super();
         this.authenticationManager = authenticationManager;
-        setFilterProcessesUrl("/api/login");
+        setFilterProcessesUrl("/login");
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
 
+        if (!request.getMethod().equals("POST")) {
+            return null; // Or throw an exception
+        }
+        
+        System.out.println("--- Login Request Received ---");
+        System.out.println("Method: " + request.getMethod());
+        System.out.println("Content-Type: " + request.getContentType());
+        System.out.println("Content-Length: " + request.getContentLength());
+
         User user = null;
         try {
             user = new ObjectMapper().readValue(request.getInputStream(), User.class);
-            System.out.println("Login attempt for user: " + user.getUsername());
+            if (user != null) {
+                System.out.println("Login attempt for user: " + user.getUsername());
+            }
         } catch (Exception e) {
             System.err.println("Error reading login request: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException("Body is empty or invalid JSON. Content-Type: " + request.getContentType());
+        }
+
+        if (user == null) {
+            throw new RuntimeException("User object is null after parsing JSON");
         }
 
         return authenticationManager.authenticate(
@@ -50,7 +67,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException failed) throws IOException, ServletException {
-        System.err.println("Authentication failed: " + failed.getMessage());
+        System.err.println("!!! AUTHENTICATION FAILED !!!");
+        System.err.println("URI: " + request.getRequestURI());
+        System.err.println("Method: " + request.getMethod());
+        System.err.println("Reason: " + failed.getMessage());
         super.unsuccessfulAuthentication(request, response, failed);
     }
 
@@ -72,6 +92,23 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .sign(Algorithm.HMAC256(SecParams.SECRET));
 
         System.out.println("Login successful. Setting Authorization header: " + SecParams.PREFIX + jwt);
+        
+        // Brute force CORS headers for the login response specifically
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+        response.setHeader("Access-Control-Expose-Headers", "Authorization");
+        response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+        
         response.addHeader("Authorization", SecParams.PREFIX + jwt);
+        
+        // Also return as JSON body
+        response.setContentType("application/json");
+        Map<String, Object> loginResponse = new java.util.HashMap<>();
+        loginResponse.put("token", jwt);
+        loginResponse.put("username", springUser.getUsername());
+        loginResponse.put("roles", roles);
+        
+        String json = new ObjectMapper().writeValueAsString(loginResponse);
+        response.getWriter().write(json);
+        response.getWriter().flush();
     }
 }

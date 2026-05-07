@@ -23,30 +23,50 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        
+        // CORS pre-flight requests
+        if (request.getMethod().equals("OPTIONS")) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
 
         String jwt = request.getHeader("Authorization");
+        System.out.println("--- Authorization Filter ---");
+        System.out.println("URI: " + request.getRequestURI());
+        System.out.println("Header: " + jwt);
 
-        if (jwt == null || !jwt.startsWith(SecParams.PREFIX)) {
+        if (jwt == null || (!jwt.startsWith(SecParams.PREFIX) && !jwt.startsWith("Bearer "))) {
+            System.out.println("No valid JWT header found.");
             filterChain.doFilter(request, response);
             return;
         }
 
-        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SecParams.SECRET)).build();
-        
-        // Remove prefix
-        jwt = jwt.substring(SecParams.PREFIX.length());
+        try {
+            // Remove prefix
+            if (jwt.startsWith(SecParams.PREFIX)) {
+                jwt = jwt.substring(SecParams.PREFIX.length());
+            } else if (jwt.startsWith("Bearer ")) {
+                jwt = jwt.substring(7);
+            }
 
-        DecodedJWT decodedJWT = verifier.verify(jwt);
-        String username = decodedJWT.getSubject();
-        List<String> roles = decodedJWT.getClaims().get("roles").asList(String.class);
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SecParams.SECRET)).build();
+            DecodedJWT decodedJWT = verifier.verify(jwt);
+            String username = decodedJWT.getSubject();
+            System.out.println("Authenticated User: " + username);
+            
+            List<String> roles = decodedJWT.getClaims().get("roles").asList(String.class);
 
-        Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        for (String r : roles)
-            authorities.add(new SimpleGrantedAuthority(r));
+            Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+            for (String r : roles)
+                authorities.add(new SimpleGrantedAuthority(r));
 
-        UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(user);
+            
+        } catch (Exception e) {
+            System.err.println("JWT Verification Failed: " + e.getMessage());
+        }
 
-        SecurityContextHolder.getContext().setAuthentication(user);
         filterChain.doFilter(request, response);
     }
 }

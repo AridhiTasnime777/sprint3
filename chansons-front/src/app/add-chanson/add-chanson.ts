@@ -17,6 +17,8 @@ export class AddChanson implements OnInit {
   newChanson = new Chanson();
   albums: Album[] = [];
   newIdAlb!: number;
+  uploadedImage!: File;
+  imagePath: any;
 
   constructor(private chansonService: ChansonService, private router: Router) { }
 
@@ -26,11 +28,21 @@ export class AddChanson implements OnInit {
     });
   }
 
+  onImageUpload(event: any) {
+    this.uploadedImage = event.target.files[0];
+    var reader = new FileReader();
+    reader.readAsDataURL(this.uploadedImage);
+    reader.onload = (_event) => { this.imagePath = reader.result; }
+  }
+
   addChanson() {
-    this.newChanson.album = this.albums.find(a => a.idalb == this.newIdAlb)!;
-    this.chansonService.ajouterChanson(this.newChanson).subscribe(ch => {
-      console.log(ch);
-      this.router.navigate(['chansons']);
+    this.chansonService.uploadImage(this.uploadedImage).subscribe((img: any) => {
+      this.newChanson.image = img;
+      this.newChanson.album = this.albums.find(a => a.idalb == this.newIdAlb)!;
+      this.chansonService.ajouterChanson(this.newChanson).subscribe(ch => {
+        console.log(ch);
+        this.router.navigate(['chansons']);
+      });
     });
   }
 }

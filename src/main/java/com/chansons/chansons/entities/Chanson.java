@@ -1,6 +1,8 @@
 package com.chansons.chansons.entities;
 
 import java.util.Date;
+import java.util.List;
+import jakarta.persistence.OneToMany;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,6 +44,11 @@ public class Chanson {
     @ManyToOne
     private Album album;
 
+    private String imagePath;
+
+    @OneToMany(mappedBy = "chanson", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images;
+
     public Chanson(String title, String artist, Date releaseDate) {
         this.title = title;
         this.artist = artist;
@@ -60,6 +67,11 @@ public class Chanson {
     public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
     public Album getAlbum() { return album; }
     public void setAlbum(Album album) { this.album = album; }
+
+    public String getImagePath() { return imagePath; }
+    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
+    public List<Image> getImages() { return images; }
+    public void setImages(List<Image> images) { this.images = images; }
 
     @Override
     public String toString() {

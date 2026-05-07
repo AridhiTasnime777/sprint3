@@ -27,4 +27,6 @@ public interface ChansonService {
 	List<Chanson> trierChansonsParTitreEtDate();
 	List<Album> getAllAlbums();
 	ChansonDTO convertEntityToDto (Chanson chanson);
+	Chanson convertDtoToEntity(ChansonDTO dto);
+	List<ChansonDTO> getAllChansonsDTO();
 }

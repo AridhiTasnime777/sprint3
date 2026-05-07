@@ -10,6 +10,7 @@
                         <th>Artiste</th>
                         <th>Date de Sortie</th>
                         <th>Album</th>
+                        <th>Image</th>
                         @if(authService.isAdmin()) {
                             <th>Action</th>
                             <th>Action</th>
@@ -24,6 +25,7 @@
                         <td>{{chanson.artist}}</td>
                         <td>{{chanson.releaseDate | date:'dd/MM/yyyy'}}</td>
                         <td>{{chanson.album?.nomAlb}}</td>
+                        <td><img *ngIf="chanson.image" [src]="'http://localhost:8081/api/image/get/' + chanson.image.idImage" width="50" height="50" class="rounded-circle"></td>
                         @if(authService.isAdmin()) {
                             <td><a class="btn btn-danger" (click)="supprimerChanson(chanson)">Supprimer</a></td>
                             <td><a class="btn btn-success" [routerLink]="['/updateChanson', chanson.idChanson]">Modifier</a></td>

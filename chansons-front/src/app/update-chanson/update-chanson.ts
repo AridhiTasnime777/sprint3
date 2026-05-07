@@ -19,6 +19,9 @@ export class UpdateChanson implements OnInit {
   updatedIdAlb!: number;
   debugInfo: string = "Init...";
   errorMessage: string = "";
+  myImage: any;
+  uploadedImage!: File;
+  isImageUpdated: boolean = false;
 
   constructor(private activatedRoute: ActivatedRoute,
               private router: Router,
@@ -37,6 +40,9 @@ export class UpdateChanson implements OnInit {
         this.debugInfo += " | Success! Title: " + ch.title;
         this.currentChanson = ch;
         this.updatedIdAlb = ch.album?.idalb!;
+        if (this.currentChanson.image) {
+          this.myImage = 'data:' + this.currentChanson.image.type + ';base64,' + this.currentChanson.image.image;
+        }
         this.cdr.detectChanges(); // FORCES Angular to update the view immediately
       },
       error: (err) => {
@@ -48,15 +54,27 @@ export class UpdateChanson implements OnInit {
 
   updateChanson() {
     this.currentChanson.album = this.albums.find(a => a.idalb == this.updatedIdAlb)!;
-    this.chansonService.updateChanson(this.currentChanson).subscribe({
-      next: (ch) => {
+    
+    if (this.isImageUpdated) {
+      this.chansonService.uploadImage(this.uploadedImage).subscribe((img: any) => {
+        this.currentChanson.image = img;
+        this.chansonService.updateChanson(this.currentChanson).subscribe(() => {
+          this.router.navigate(['chansons']);
+        });
+      });
+    } else {
+      this.chansonService.updateChanson(this.currentChanson).subscribe(() => {
         this.router.navigate(['chansons']);
-      },
-      error: (err) => {
-        console.error("Error updating chanson:", err);
-        alert("Erreur lors de la modification. Regardez la console (F12).");
-      }
-    });
+      });
+    }
+  }
+
+  onImageUpload(event: any) {
+    this.isImageUpdated = true;
+    this.uploadedImage = event.target.files[0];
+    var reader = new FileReader();
+    reader.readAsDataURL(this.uploadedImage);
+    reader.onload = (_event) => { this.myImage = reader.result; }
   }
 }
 

@@ -5,4 +5,7 @@ export class Chanson {
     artist!: string;
     releaseDate!: Date;
     album?: Album;
+    imagePath!: string;
+    image!: any;
+    images!: any[];
 }

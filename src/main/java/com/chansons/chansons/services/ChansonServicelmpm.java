@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.chansons.chansons.entities.Album;
 import com.chansons.chansons.entities.Chanson;
+import com.chansons.chansons.entities.Image;
 import com.chansons.chansons.repositories.AlbumRepository;
 import com.chansons.chansons.repositories.ChansonRepository;
 import com.chansons.chansons.dto.ChansonDTO;
@@ -23,6 +24,9 @@ public class ChansonServicelmpm implements ChansonService {
 
     @Autowired
     AlbumRepository albumRepository;
+
+    @Autowired
+    com.chansons.chansons.repositories.ImageRepository imageRepository;
 
     @Override
     public Page<Chanson> getAllChansonsParPage(int page, int size) {
@@ -117,6 +121,12 @@ public class ChansonServicelmpm implements ChansonService {
         dto.setArtist(ch.getArtist());
         dto.setReleaseDate(ch.getReleaseDate());
         dto.setAlbum(ch.getAlbum());
+        dto.setImagePath(ch.getImagePath());
+        dto.setImages(ch.getImages());
+        // Set the first image as the main image if available
+        if (ch.getImages() != null && !ch.getImages().isEmpty()) {
+            dto.setImage(ch.getImages().get(0));
+        }
         return dto;
     }
 
@@ -127,6 +137,27 @@ public class ChansonServicelmpm implements ChansonService {
         ch.setArtist(dto.getArtist());
         ch.setReleaseDate(dto.getReleaseDate());
         ch.setAlbum(dto.getAlbum());
+        ch.setImagePath(dto.getImagePath());
+        
+        java.util.List<Image> images = new java.util.ArrayList<>();
+        if (dto.getImages() != null) {
+            for (Image img : dto.getImages()) {
+                if (img.getIdImage() != null) {
+                    img = imageRepository.findById(img.getIdImage()).orElse(img);
+                }
+                img.setChanson(ch);
+                images.add(img);
+            }
+        } else if (dto.getImage() != null) {
+            Image img = dto.getImage();
+            if (img.getIdImage() != null) {
+                img = imageRepository.findById(img.getIdImage()).orElse(img);
+            }
+            img.setChanson(ch);
+            images.add(img);
+        }
+        ch.setImages(images);
+        
         return ch;
     }
 
